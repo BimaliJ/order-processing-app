@@ -1,51 +1,68 @@
 package com.demo.order.app.service;
 
-import com.demo.order.app.dao.OrderDao;
+import com.demo.order.app.exception.OrderProcessingException;
+import com.demo.order.app.mapper.OrderMapper;
 import com.demo.order.app.model.Order;
-import com.demo.order.app.model.OrderFiltering;
+import com.demo.order.app.model.OrderStatus;
+import com.demo.order.app.model.entities.OrderEntity;
+import com.demo.order.app.repositories.OrderRepository;
+import com.demo.order.app.util.OrderFilteringUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 @Service
 public class OrderProcessingService
 {
-    private final OrderDao orderDAO;
+    private final OrderRepository orderRepository;
+    private final OrderMapper orderMapper;
 
-    public OrderProcessingService(OrderDao orderDAO) {
-        this.orderDAO = orderDAO;
+    public OrderProcessingService(OrderRepository orderRepository,
+                                  OrderMapper orderMapper)
+    {
+        this.orderRepository = orderRepository;
+        this.orderMapper = orderMapper;
     }
 
-    public void createOrder()
+    public void createOrder(String orderName, String customerName)
     {
-
+        Order order = Order.builder().orderName(orderName)
+                .customerName(customerName)
+                .orderStatus(OrderStatus.CREATED)
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now()).build();
+        OrderEntity orderEntity = orderMapper.orderToOrderEntity(order);
+        orderRepository.save(orderEntity);
     }
 
-    public Order retrieveOrderDetails()
-    {
-        return null;
+    public Order getOrderDetails(Long id) throws OrderProcessingException {
+        OrderEntity orderEntity = orderRepository.findById(id)
+                .orElseThrow(() -> new OrderProcessingException("Order not found with id : ", id));
+        return orderMapper.orderEntityToOrder(orderEntity);
     }
 
-    public Order updateOrder()
-    {
-        return null;
+    public void updateOrder(Long id, OrderStatus orderStatus) throws OrderProcessingException {
+            OrderEntity entity = orderRepository.findById(id)
+                    .orElseThrow(() -> new OrderProcessingException("Order not found with id : ", id));
+            entity.setOrderStatus(orderStatus);
+            orderRepository.save(entity);
     }
 
     public Page<Order> searchOrders(
                 Order orderSearchRequest,
                 Pageable pageable) {
 
-            Specification<Order> spec = Specification
-                    .where(OrderFiltering.hasCustomer(orderSearchRequest.getCustomerName()))
-                    .and(OrderFiltering.hasStatus(orderSearchRequest.getOrderStatus()))
-                    .and(OrderFiltering.createdAt(orderSearchRequest.getCreatedAt()))
-                    .and(OrderFiltering.updatedAt(orderSearchRequest.getUpdatedAt()));
+        Specification<OrderEntity> spec = Specification
+                .where(OrderFilteringUtil.hasCustomer(orderSearchRequest.getCustomerName()))
+                .and(OrderFilteringUtil.hasStatus(orderSearchRequest.getOrderStatus()))
+                .and(OrderFilteringUtil.createdAt(orderSearchRequest.getCreatedAt()))
+                .and(OrderFilteringUtil.updatedAt(orderSearchRequest.getUpdatedAt()));
 
-
-            //return orderRepository.findAll(spec, pageable);
-        return Page.empty(pageable);
-        }
-
+        Page<OrderEntity> entityPage = orderRepository.findAll(spec, pageable);
+        return entityPage.map(orderMapper::orderEntityToOrder);
+    }
 
 }

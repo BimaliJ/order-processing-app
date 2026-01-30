@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <title>Order Management</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        table { border-collapse: collapse; width: 100%; margin-top: 10px; }
+        th, td { border: 1px solid #ccc; padding: 8px; }
+        th { background-color: #f4f4f4; }
+        form { margin-bottom: 15px; }
+    </style>
+</head>
+<body>
+
+<h2>Order Management</h2>
+
+<!-- ================= CREATE ORDER ================= -->
+<div sec:authorize="hasRole('ADMIN')">
+    <h3>Create Order</h3>
+
+    <form method="post" th:action="@{/ui/orders}">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
+        <label>Order Name:</label>
+        <input type="text" name="orderName" required />
+
+        <label>Customer Name:</label>
+        <input type="text" name="customerName" required />
+
+        <button type="submit">Create</button>
+    </form>
+</div>
+
+<hr/>
+
+<!-- ================= SEARCH ================= -->
+<h3>Search Orders</h3>
+
+<form method="get" th:action="@{/ui/orders}">
+    <label>Status:</label>
+    <select name="orderStatus">
+        <option value="">ALL</option>
+        <option th:each="s : ${T(com.demo.order.app.model.OrderStatus).values()}"
+                th:value="${s}"
+                th:text="${s}"
+                th:selected="${s == orderFilter.orderStatus}">
+        </option>
+    </select>
+
+    <button type="submit">Search</button>
+</form>
+
+<hr/>
+
+<!-- ================= ORDERS TABLE ================= -->
+<h3>Orders</h3>
+
+<table>
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Order Name</th>
+        <th>Customer</th>
+        <th>Status</th>
+        <th>Created At</th>
+        <th>Updated At</th>
+        <th sec:authorize="hasRole('ADMIN')">Update Status</th>
+        <th>View</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    <tr th:each="order : ${orders.content}">
+        <td th:text="${order.id}"></td>
+        <td th:text="${order.orderName}"></td>
+        <td th:text="${order.customerName}"></td>
+        <td th:text="${order.orderStatus}"></td>
+        <td th:text="${#temporals.format(order.createdAt, 'yyyy-MM-dd HH:mm')}"></td>
+        <td th:text="${order.updatedAt != null ? #temporals.format(order.updatedAt, 'yyyy-MM-dd HH:mm') : '-'}"></td>
+
+        <!-- Update status (ADMIN only) -->
+        <td sec:authorize="hasRole('ADMIN')">
+            <form method="post"
+                  th:action="@{/ui/orders/{id}/status(id=${order.id})}">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
+                <select name="orderStatus">
+                    <option th:each="s : ${T(com.demo.order.app.model.OrderStatus).values()}"
+                            th:value="${s}"
+                            th:text="${s}"
+                            th:selected="${s == order.orderStatus}">
+                    </option>
+                </select>
+
+                <button type="submit">Update</button>
+            </form>
+        </td>
+
+        <!-- View details -->
+        <td>
+            <a th:href="@{/ui/orders/{id}(id=${order.id})}">View</a>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<hr/>
+
+<!-- ================= PAGINATION ================= -->
+<div>
+    <a th:if="${orders.hasPrevious()}"
+       th:href="@{/ui/orders(page=${orders.number - 1}, orderStatus=${orderStatus})}">
+        Previous
+    </a>
+
+    <span>
+        Page <b th:text="${orders.number + 1}"></b>
+        of <b th:text="${orders.totalPages}"></b>
+    </span>
+
+    <a th:if="${orders.hasNext()}"
+       th:href="@{/ui/orders(page=${orders.number + 1}, orderStatus=${orderStatus})}">
+        Next
+    </a>
+</div>
+
+</body>
+</html>
