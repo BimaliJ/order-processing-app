@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Order Details</title>
+</head>
+<body>
+
+<h2>Order Details</h2>
+
+<table border="1">
+    <tr>
+        <th>ID</th>
+        <td th:text="${order.id}"></td>
+    </tr>
+    <tr>
+        <th>Order Name</th>
+        <td th:text="${order.orderName}"></td>
+    </tr>
+    <tr>
+        <th>Customer</th>
+        <td th:text="${order.customerName}"></td>
+    </tr>
+    <tr>
+        <th>Status</th>
+        <td th:text="${order.orderStatus}"></td>
+    </tr>
+    <tr>
+        <th>Created At</th>
+        <td th:text="${#temporals.format(order.createdAt, 'yyyy-MM-dd HH:mm')}"></td>
+    </tr>
+    <tr>
+        <th>Updated At</th>
+        <td th:text="${#temporals.format(order.updatedAt, 'yyyy-MM-dd HH:mm')}"></td>
+    </tr>
+</table>
+
+<br/>
+
+<a th:href="@{/ui/orders}">Back to Orders</a>
+
+</body>
+</html>
