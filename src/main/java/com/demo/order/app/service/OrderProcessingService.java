@@ -19,23 +19,28 @@ public class OrderProcessingService
 {
     private final OrderRepository orderRepository;
     private final OrderMapper orderMapper;
+    private final NotificationDispatcher notificationDispatcher;
 
     public OrderProcessingService(OrderRepository orderRepository,
-                                  OrderMapper orderMapper)
+                                  OrderMapper orderMapper, NotificationDispatcher notificationDispatcher)
     {
         this.orderRepository = orderRepository;
         this.orderMapper = orderMapper;
+        this.notificationDispatcher = notificationDispatcher;
     }
 
-    public void createOrder(String orderName, String customerName)
+    public Order createOrder(Order order)
     {
-        Order order = Order.builder().orderName(orderName)
-                .customerName(customerName)
-                .orderStatus(OrderStatus.CREATED)
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now()).build();
+
+                order.setOrderStatus(OrderStatus.CREATED);
+                order.setCreatedAt(LocalDateTime.now());
+                order.setUpdatedAt(LocalDateTime.now());
         OrderEntity orderEntity = orderMapper.orderToOrderEntity(order);
-        orderRepository.save(orderEntity);
+        OrderEntity savedEntity = orderRepository.save(orderEntity);
+        Order savedOrder = orderMapper.orderEntityToOrder(savedEntity);
+        // notification sent
+        notificationDispatcher.notifyOrderCreated(order);
+        return  savedOrder;
     }
 
     public Order getOrderDetails(Long id) throws OrderProcessingException {
@@ -44,11 +49,15 @@ public class OrderProcessingService
         return orderMapper.orderEntityToOrder(orderEntity);
     }
 
-    public void updateOrder(Long id, OrderStatus orderStatus) throws OrderProcessingException {
+    public Order updateOrder(Long id, OrderStatus orderStatus) throws OrderProcessingException {
             OrderEntity entity = orderRepository.findById(id)
                     .orElseThrow(() -> new OrderProcessingException("Order not found with id : ", id));
             entity.setOrderStatus(orderStatus);
             orderRepository.save(entity);
+            Order updatedOrder = orderMapper.orderEntityToOrder(entity);
+            //notification sent
+            notificationDispatcher.notifyOrderUpdated(updatedOrder);
+            return updatedOrder;
     }
 
     public Page<Order> searchOrders(
@@ -58,8 +67,7 @@ public class OrderProcessingService
         Specification<OrderEntity> spec = Specification
                 .where(OrderFilteringUtil.hasCustomer(orderSearchRequest.getCustomerName()))
                 .and(OrderFilteringUtil.hasStatus(orderSearchRequest.getOrderStatus()))
-                .and(OrderFilteringUtil.createdAt(orderSearchRequest.getCreatedAt()))
-                .and(OrderFilteringUtil.updatedAt(orderSearchRequest.getUpdatedAt()));
+                .and(OrderFilteringUtil.hasOrderName(orderSearchRequest.getOrderName()));
 
         Page<OrderEntity> entityPage = orderRepository.findAll(spec, pageable);
         return entityPage.map(orderMapper::orderEntityToOrder);

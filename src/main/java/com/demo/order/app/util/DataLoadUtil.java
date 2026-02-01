@@ -1,5 +1,6 @@
 package com.demo.order.app.util;
 
+import com.demo.order.app.model.Order;
 import com.demo.order.app.service.OrderProcessingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
@@ -13,8 +14,13 @@ public class DataLoadUtil implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        orderProcessingService.createOrder("Order 1", "Ann Loran");
-        orderProcessingService.createOrder("Order 2", "Mathew Feros");
-        orderProcessingService.createOrder("Order 3", "Lola Hnry");
+        Order oder1 = Order.builder().orderName("Order 1").customerName("Ann Loran").build();
+        orderProcessingService.createOrder(oder1);
+        Order oder2 = Order.builder().orderName("Order 2").customerName("Mathew Feros").build();
+
+        orderProcessingService.createOrder(oder2);
+        Order oder3 = Order.builder().orderName("Order 3").customerName("Lola Hnry").build();
+
+        orderProcessingService.createOrder(oder3);
     }
 }

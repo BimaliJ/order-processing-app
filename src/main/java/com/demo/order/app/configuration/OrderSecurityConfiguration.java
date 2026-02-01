@@ -22,7 +22,7 @@ public class OrderSecurityConfiguration
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
-                .csrf(Customizer.withDefaults())
+                .csrf(csrf -> csrf.ignoringRequestMatchers("/api/**", "/h2-console/**"))
 
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/login", "/h2-console/**").permitAll()
@@ -36,9 +36,18 @@ public class OrderSecurityConfiguration
                         .requestMatchers(HttpMethod.PUT, "/orders/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/orders/**").hasAnyRole("USER", "ADMIN")
 
+                        // REST
+                        .requestMatchers(HttpMethod.POST, "/api/orders/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/orders/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/orders/**")
+                        .hasAnyRole("USER", "ADMIN")
+
                         .anyRequest().authenticated()
                 )
+                // API Auth
+                .httpBasic(Customizer.withDefaults())
 
+                // Browser Login
                 .formLogin(form -> form
                         .loginPage("/login")
                         .defaultSuccessUrl("/ui/orders", true)
