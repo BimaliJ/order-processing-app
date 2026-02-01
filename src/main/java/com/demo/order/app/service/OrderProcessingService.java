@@ -29,17 +29,18 @@ public class OrderProcessingService
         this.notificationDispatcher = notificationDispatcher;
     }
 
-    public void createOrder(String orderName, String customerName)
+    public Order createOrder(Order order)
     {
-        Order order = Order.builder().orderName(orderName)
-                .customerName(customerName)
-                .orderStatus(OrderStatus.CREATED)
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now()).build();
+
+                order.setOrderStatus(OrderStatus.CREATED);
+                order.setCreatedAt(LocalDateTime.now());
+                order.setUpdatedAt(LocalDateTime.now());
         OrderEntity orderEntity = orderMapper.orderToOrderEntity(order);
-        orderRepository.save(orderEntity);
+        OrderEntity savedEntity = orderRepository.save(orderEntity);
+        Order savedOrder = orderMapper.orderEntityToOrder(savedEntity);
         // notification sent
         notificationDispatcher.notifyOrderCreated(order);
+        return  savedOrder;
     }
 
     public Order getOrderDetails(Long id) throws OrderProcessingException {
@@ -48,7 +49,7 @@ public class OrderProcessingService
         return orderMapper.orderEntityToOrder(orderEntity);
     }
 
-    public void updateOrder(Long id, OrderStatus orderStatus) throws OrderProcessingException {
+    public Order updateOrder(Long id, OrderStatus orderStatus) throws OrderProcessingException {
             OrderEntity entity = orderRepository.findById(id)
                     .orElseThrow(() -> new OrderProcessingException("Order not found with id : ", id));
             entity.setOrderStatus(orderStatus);
@@ -56,6 +57,7 @@ public class OrderProcessingService
             Order updatedOrder = orderMapper.orderEntityToOrder(entity);
             //notification sent
             notificationDispatcher.notifyOrderUpdated(updatedOrder);
+            return updatedOrder;
     }
 
     public Page<Order> searchOrders(
