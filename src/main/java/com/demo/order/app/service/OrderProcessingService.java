@@ -65,8 +65,7 @@ public class OrderProcessingService
         Specification<OrderEntity> spec = Specification
                 .where(OrderFilteringUtil.hasCustomer(orderSearchRequest.getCustomerName()))
                 .and(OrderFilteringUtil.hasStatus(orderSearchRequest.getOrderStatus()))
-                .and(OrderFilteringUtil.createdAt(orderSearchRequest.getCreatedAt()))
-                .and(OrderFilteringUtil.updatedAt(orderSearchRequest.getUpdatedAt()));
+                .and(OrderFilteringUtil.hasOrderName(orderSearchRequest.getOrderName()));
 
         Page<OrderEntity> entityPage = orderRepository.findAll(spec, pageable);
         return entityPage.map(orderMapper::orderEntityToOrder);

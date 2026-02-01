@@ -49,6 +49,17 @@
 <h3>Search Orders</h3>
 
 <form method="get" th:action="@{/ui/orders}">
+
+    <label>Order Name:</label>
+    <input type="text"
+           name="orderName"
+           th:value="${orderFilter.orderName}" />
+
+    <label>Customer Name:</label>
+    <input type="text"
+           name="customerName"
+           th:value="${orderFilter.customerName}" />
+
     <label>Status:</label>
     <select name="orderStatus">
         <option value="">ALL</option>
