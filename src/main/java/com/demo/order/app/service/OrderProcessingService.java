@@ -19,12 +19,14 @@ public class OrderProcessingService
 {
     private final OrderRepository orderRepository;
     private final OrderMapper orderMapper;
+    private final NotificationDispatcher notificationDispatcher;
 
     public OrderProcessingService(OrderRepository orderRepository,
-                                  OrderMapper orderMapper)
+                                  OrderMapper orderMapper, NotificationDispatcher notificationDispatcher)
     {
         this.orderRepository = orderRepository;
         this.orderMapper = orderMapper;
+        this.notificationDispatcher = notificationDispatcher;
     }
 
     public void createOrder(String orderName, String customerName)
@@ -36,6 +38,8 @@ public class OrderProcessingService
                 .updatedAt(LocalDateTime.now()).build();
         OrderEntity orderEntity = orderMapper.orderToOrderEntity(order);
         orderRepository.save(orderEntity);
+        // notification sent
+        notificationDispatcher.notifyOrderCreated(order);
     }
 
     public Order getOrderDetails(Long id) throws OrderProcessingException {
@@ -49,6 +53,9 @@ public class OrderProcessingService
                     .orElseThrow(() -> new OrderProcessingException("Order not found with id : ", id));
             entity.setOrderStatus(orderStatus);
             orderRepository.save(entity);
+            Order updatedOrder = orderMapper.orderEntityToOrder(entity);
+            //notification sent
+            notificationDispatcher.notifyOrderUpdated(updatedOrder);
     }
 
     public Page<Order> searchOrders(

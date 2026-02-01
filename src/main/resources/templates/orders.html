@@ -14,6 +14,17 @@
 <body>
 
 <h2>Order Management</h2>
+<!-- ================= FLASH MESSAGES ================= -->
+
+<div th:if="${successMessage}"
+     style="padding:10px; background:#e6fffa; color:#065f46; margin-bottom:10px;">
+    <span th:text="${successMessage}"></span>
+</div>
+
+<div th:if="${errorMessage}"
+     style="padding:10px; background:#fee2e2; color:#991b1b; margin-bottom:10px;">
+    <span th:text="${errorMessage}"></span>
+</div>
 
 <!-- ================= CREATE ORDER ================= -->
 <div sec:authorize="hasRole('ADMIN')">

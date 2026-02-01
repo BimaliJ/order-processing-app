@@ -29,9 +29,12 @@ public class OrderProcessingController {
     @PostMapping
     public String createOrder(
             @RequestParam String orderName,
-            @RequestParam String customerName) {
+            @RequestParam String customerName,
+            RedirectAttributes redirectAttributes) {
 
         orderProcessingService.createOrder(orderName, customerName);
+        redirectAttributes.addFlashAttribute(
+                "successMessage", "Order created and notification sent.");
         return "redirect:/ui/orders";
     }
 
@@ -41,10 +44,12 @@ public class OrderProcessingController {
     @PostMapping("/{id}/status")
     public String updateOrderStatus(
             @PathVariable Long id,
-            @RequestParam OrderStatus orderStatus) {
-        try
-        {
+            @RequestParam OrderStatus orderStatus,
+            RedirectAttributes redirectAttributes) {
+        try {
             orderProcessingService.updateOrder(id, orderStatus);
+            redirectAttributes.addFlashAttribute(
+                    "successMessage", "Order status updated and notification sent.");
 
         } catch (OrderProcessingException e) {
             log.error("Order not found with the provided id : {}", id, e);
@@ -58,13 +63,10 @@ public class OrderProcessingController {
     @GetMapping("/{id}")
     public String getOrder(@PathVariable Long id, Model model,
                            RedirectAttributes redirectAttributes) {
-        try
-        {
+        try {
             Order order = orderProcessingService.getOrderDetails(id);
             model.addAttribute("order", order);
-        }
-        catch (OrderProcessingException e)
-        {
+        } catch (OrderProcessingException e) {
             log.error("Order not found with the provided id : {}", id, e);
             redirectAttributes.addFlashAttribute("errorMessage", "Order not found");
         }
