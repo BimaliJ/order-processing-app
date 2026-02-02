@@ -6,14 +6,20 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
+/**
+ * This component is responsible for inserting
+ * data when the application starts
+ */
 @Component
 @RequiredArgsConstructor
-public class DataLoadUtil implements CommandLineRunner {
+public class DataLoadUtil implements CommandLineRunner
+{
 
     private final OrderProcessingService orderProcessingService;
 
     @Override
-    public void run(String... args) {
+    public void run(String... args)
+    {
         Order oder1 = Order.builder().orderName("Order 1").customerName("Ann Loran").build();
         orderProcessingService.createOrder(oder1);
         Order oder2 = Order.builder().orderName("Order 2").customerName("Mathew Feros").build();

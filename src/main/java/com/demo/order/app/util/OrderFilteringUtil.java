@@ -6,7 +6,8 @@ import org.springframework.data.jpa.domain.Specification;
 
 public class OrderFilteringUtil
 {
-    public static Specification<OrderEntity> hasCustomer(String customerName) {
+    public static Specification<OrderEntity> hasCustomer(String customerName)
+    {
         return (root, query, cb) ->
                 customerName == null || customerName.isBlank()
                         ? cb.conjunction()
@@ -14,7 +15,8 @@ public class OrderFilteringUtil
                                 "%" + customerName.toLowerCase() + "%");
     }
 
-    public static Specification<OrderEntity> hasOrderName(String orderName) {
+    public static Specification<OrderEntity> hasOrderName(String orderName)
+    {
         return (root, query, cb) ->
                 orderName == null || orderName.isBlank()
                         ? cb.conjunction()
@@ -22,7 +24,8 @@ public class OrderFilteringUtil
                                 "%" + orderName.toLowerCase() + "%");
     }
 
-    public static Specification<OrderEntity> hasStatus(OrderStatus status) {
+    public static Specification<OrderEntity> hasStatus(OrderStatus status)
+    {
         return (root, query, cb) ->
                 status == null ? null :
                         cb.equal(root.get("orderStatus"), status);

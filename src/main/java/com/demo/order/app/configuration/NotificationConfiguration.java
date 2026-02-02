@@ -4,11 +4,13 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.retry.annotation.EnableRetry;
 
 @Configuration
 @ConfigurationProperties(prefix = "notification")
 @Getter
 @Setter
+@EnableRetry
 public class NotificationConfiguration {
 
     private boolean enabled;
