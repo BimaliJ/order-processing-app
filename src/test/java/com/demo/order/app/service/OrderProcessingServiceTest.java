@@ -12,6 +12,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -39,14 +40,24 @@ class OrderProcessingServiceTest
     void test_createOrder_success()
     {
 
-        OrderEntity entity = new OrderEntity();
+        String orderName = "Order1";
+        String customerName = "Ann Loran";
+
+        OrderEntity entity = OrderEntity.builder()
+                .id(1L)
+                .orderName(orderName)
+                .customerName(customerName)
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now()).build();
         Order order = Order.builder()
-                .orderName("Order 1")
-                .customerName("Ann Loran")
+                .orderName(orderName)
+                .customerName(customerName)
                 .build();
 
         when(orderMapper.orderToOrderEntity(any(Order.class)))
                 .thenReturn(entity);
+        when(orderRepository.save(any())).thenReturn(entity);
+        when(orderMapper.orderEntityToOrder(entity)).thenReturn(order);
 
         orderProcessingService.createOrder(order);
 
