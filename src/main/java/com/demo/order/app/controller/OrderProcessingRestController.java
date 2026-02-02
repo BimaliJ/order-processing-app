@@ -12,6 +12,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * This class is the REST endpoint implementation
+ * for Order processing and notification app
+ */
 @Log4j2
 @RestController
 @RequestMapping("/api/orders")
@@ -33,6 +37,7 @@ public class OrderProcessingRestController
         try
         {
             Order order = orderService.getOrderDetails(id);
+            // when success return 200 with the response
             return ResponseEntity.ok(order);
         }
         catch (OrderProcessingException e) {

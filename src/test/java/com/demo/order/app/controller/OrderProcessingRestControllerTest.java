@@ -19,7 +19,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-class OrderProcessingRestControllerTest {
+class OrderProcessingRestControllerTest
+{
     @Autowired
     private MockMvc mockMvc;
 
@@ -28,7 +29,8 @@ class OrderProcessingRestControllerTest {
 
     @Test
     @WithMockUser(username = "admin", roles = "ADMIN")
-    void updateOrderStatus_success() throws Exception {
+    void test_updateOrderStatus_success() throws Exception
+    {
 
         Order order = Order.builder()
                 .id(1L)
@@ -48,7 +50,8 @@ class OrderProcessingRestControllerTest {
 
     @Test
     @WithMockUser(username = "user", roles = "USER")
-    void updateOrderStatus_forbiddenForUser() throws Exception {
+    void test_updateOrderStatus_forbiddenForUser() throws Exception
+    {
 
         mockMvc.perform(put("/api/orders/1/status")
                         .param("orderStatus", "COMPLETED"))
@@ -57,7 +60,8 @@ class OrderProcessingRestControllerTest {
 
     @Test
     @WithMockUser(username = "admin", roles = "ADMIN")
-    void updateOrderStatus_orderNotFound() throws Exception {
+    void test_updateOrderStatus_orderNotFound() throws Exception
+    {
 
         when(orderProcessingService.updateOrder(1L, OrderStatus.COMPLETED))
                 .thenThrow(new OrderProcessingException("Not found"));

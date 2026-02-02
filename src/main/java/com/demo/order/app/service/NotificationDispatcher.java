@@ -8,15 +8,18 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class NotificationDispatcher {
+public class NotificationDispatcher
+{
 
     private final List<NotificationService> notificationServices;
 
-    public void notifyOrderCreated(Order order) {
+    public void notifyOrderCreated(Order order)
+    {
         notificationServices.forEach(service -> service.notifyOrderCreated(order));
     }
 
-    public void notifyOrderUpdated(Order order) {
+    public void notifyOrderUpdated(Order order)
+    {
         notificationServices.forEach(service -> service.notifyOrderUpdated(order));
     }
 }

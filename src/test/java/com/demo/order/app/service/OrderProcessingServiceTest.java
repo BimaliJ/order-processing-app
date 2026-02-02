@@ -21,8 +21,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class OrderProcessingServiceTest {
-
+class OrderProcessingServiceTest
+{
     @InjectMocks
     private OrderProcessingService orderProcessingService;
 
@@ -36,7 +36,8 @@ class OrderProcessingServiceTest {
     private NotificationDispatcher notificationDispatcher;
 
     @Test
-    void createOrder_success() {
+    void test_createOrder_success()
+    {
 
         OrderEntity entity = new OrderEntity();
         Order order = Order.builder()
@@ -54,8 +55,8 @@ class OrderProcessingServiceTest {
     }
 
     @Test
-    void updateOrder_success() throws Exception {
-
+    void test_updateOrder_success() throws Exception
+    {
         OrderEntity entity = new OrderEntity();
         entity.setId(1L);
         entity.setOrderStatus(OrderStatus.CREATED);
@@ -77,8 +78,8 @@ class OrderProcessingServiceTest {
     }
 
     @Test
-    void updateOrder_notFound() {
-
+    void test_updateOrder_notFound()
+    {
         when(orderRepository.findById(1L))
                 .thenReturn(Optional.empty());
 

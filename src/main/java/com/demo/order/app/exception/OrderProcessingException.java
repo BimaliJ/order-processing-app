@@ -7,7 +7,8 @@ public class OrderProcessingException extends Exception
         super(e);
     }
 
-    public OrderProcessingException(String message, Object... params){
+    public OrderProcessingException(String message, Object... params)
+    {
         super(String.format(message, params));
     }
 }
