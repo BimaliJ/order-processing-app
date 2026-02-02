@@ -4,6 +4,11 @@ import com.demo.order.app.model.OrderStatus;
 import com.demo.order.app.model.entities.OrderEntity;
 import org.springframework.data.jpa.domain.Specification;
 
+/**
+ * This class is the Util
+ * class which includes Spring
+ * data specification
+ */
 public class OrderFilteringUtil
 {
     public static Specification<OrderEntity> hasCustomer(String customerName)
